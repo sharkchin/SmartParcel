@@ -1,0 +1,750 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Ionic.Utils.Zip</name>
+    </assembly>
+    <members>
+        <member name="T:Ionic.Utils.Zip.ZipDirEntry">
+            <summary>
+            This class models an entry in the directory contained within the zip file.
+            The class is generally not used from within application code, though it is
+            used by the ZipFile class.
+            </summary>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipDirEntry.Read(System.IO.Stream)">
+            <summary>
+            Reads one entry from the zip directory structure in the zip file. 
+            </summary>
+            <param name="s">the stream from which to read.</param>
+            <returns>the entry read from the archive.</returns>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipDirEntry.IsNotValidSig(System.Int32)">
+            <summary>
+            Returns true if the passed-in value is a valid signature for a ZipDirEntry. 
+            </summary>
+            <param name="signature">the candidate 4-byte signature value.</param>
+            <returns>true, if the signature is valid according to the PKWare spec.</returns>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipDirEntry.LastModified">
+            <summary>
+            The time at which the file represented by the given entry was last modified.
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipDirEntry.FileName">
+            <summary>
+            The filename of the file represented by the given entry.
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipDirEntry.Comment">
+            <summary>
+            Any comment associated to the given entry. Comments are generally optional.
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipDirEntry.VersionMadeBy">
+            <summary>
+            The version of the zip engine this archive was made by.  
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipDirEntry.VersionNeeded">
+            <summary>
+            The version of the zip engine this archive can be read by.  
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipDirEntry.CompressionMethod">
+            <summary>
+            The compression method used to generate the archive.  Deflate is our favorite!
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipDirEntry.CompressedSize">
+            <summary>
+            The size of the file, after compression. This size can actually be 
+            larger than the uncompressed file size, for previously compressed 
+            files, such as JPG files. 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipDirEntry.UncompressedSize">
+            <summary>
+            The size of the file before compression.  
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipDirEntry.CompressionRatio">
+            <summary>
+            The calculated compression ratio for the given file. 
+            </summary>
+        </member>
+        <member name="T:Ionic.Utils.Zip.ZipFile">
+            <summary>
+            The ZipFile type represents a zip archive file.  This is the main type in the 
+            class library that reads and writes zip files, as defined in the format
+            for zip described by PKWare.  This implementation is based on the
+            System.IO.Compression.DeflateStream base class in the .NET Framework
+            v2.0 base class library.
+            </summary>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.#ctor">
+            <summary>
+            The default constructor is private.
+            Users of the library are expected to create a ZipFile via 
+            the parameterized constructor: the constructor that
+            accepts a filename for the zip archive. 
+            </summary>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.#ctor(System.String)">
+            <summary>
+            Creates a new ZipFile instance, using the specified ZipFileName for the filename. 
+            The ZipFileName may be fully qualified.
+            </summary>
+            <remarks>
+            <para>Applications can use this constructor to create a new ZipFile for writing, 
+            or to slurp in an existing zip archive for read and write purposes.  
+            </para>
+            <para>Typically an application writing a zip archive will call this constructor, passing
+            the name of a file that does not exist, then add 
+            directories or files to the ZipFile via AddDirectory or AddFile, and then write the 
+            zip archive to the disk by calling <c>Save()</c>. The file is not actually written to the disk 
+            until the application calls <c>ZipFile.Save()</c> .
+            </para>
+            <para>
+            An application reading a zip archive can call this constructor, passing the name of a 
+            zip file that does exist.  The file is then read into the <c>ZipFile</c> instance.  The app
+            can then enumerate the entries or can add a new entry.  An application may wish to 
+            explicitly specify that it is reading an existing zip file by using <c>ZipFile.Read()</c>. 
+            The parameterized constructor allows applications to use the same code to add items 
+            to a zip archive, regardless of whether the zip file exists.  
+            </para>
+            </remarks>
+            <example>
+            <code>
+            using (ZipFile zip = new ZipFile(args[0]))
+            { 
+              // note: this does not recurse directories! 
+              String[] filenames = System.IO.Directory.GetFiles(args[1]);
+              foreach (String filename in filenames)
+              {
+                Console.WriteLine("Adding {0}...", filename);
+                zip.AddFile(filename);
+              }  
+              zip.Save();
+            }
+            </code>
+            </example>
+            
+            <param name="ZipFileName">The filename to use for the new zip archive.</param>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.#ctor(System.String,System.IO.TextWriter)">
+            <summary>
+            Creates a new ZipFile instance, using the specified ZipFileName for the filename. 
+            The ZipFileName may be fully qualified.
+            </summary>
+            <remarks>
+            <para>Applications can use this constructor to create a new ZipFile for writing, 
+            or to slurp in an existing zip archive for read and write purposes.  
+            </para>
+            <para>Typically an application writing a zip archive will call this constructor, passing
+            the name of a file that does not exist, then add 
+            directories or files to the ZipFile via AddDirectory or AddFile, and then write the 
+            zip archive to the disk by calling <c>Save()</c>. The file is not actually written to the disk 
+            until the application calls <c>ZipFile.Save()</c> .
+            </para>
+            <para>
+            An application reading a zip archive can call this constructor, passing the name of a 
+            zip file that does exist.  The file is then read into the <c>ZipFile</c> instance.  The app
+            can then enumerate the entries or can add a new entry.  An application may wish to 
+            explicitly specify that it is reading an existing zip file by using <c>ZipFile.Read()</c>. 
+            The parameterized constructor allows applications to use the same code to add items 
+            to a zip archive, regardless of whether the zip file exists.  
+            </para>
+            <para>
+            This version of the constructor allows the caller to pass in a TextWriter, to which verbose 
+            messages will be written during extraction or creation of the zip archive.  A console application
+            may wish to pass System.Console.Out to get messages on the Console. A graphical or headless application
+            may wish to capture the messages in a different TextWriter. 
+            </para>
+            </remarks>
+            <example>
+            <code>
+            using (ZipFile zip = new ZipFile(args[0]))
+            { 
+              // note: this does not recurse directories! 
+              String[] filenames = System.IO.Directory.GetFiles(args[1]);
+              foreach (String filename in filenames)
+              {
+                Console.WriteLine("Adding {0}...", filename);
+                zip.AddFile(filename);
+              }  
+              zip.Save();
+            }
+            </code>
+            </example>
+            
+            <param name="ZipFileName">The filename to use for the new zip archive.</param>
+            <param name="Output">The output TextWriter to use for verbose messages.</param>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.AddItem(System.String)">
+            <summary>
+            Adds an item, either a file or a directory, to a zip file archive.  
+            </summary>
+            
+            <remarks>
+            <para>
+            If adding a directory, the add is recursive on all files and subdirectories 
+            contained within it. 
+            </para>
+            <para>
+            The name of the item may be a relative path or a fully-qualified path.
+            The item added by this call to the ZipFile is not written to the zip file
+            archive until the application calls Save() on the ZipFile. 
+            </para>
+            <para>
+            The directory name used for the file within the archive is the same as
+            the directory name (potentially a relative path) specified in the FileOrDirectoryName.
+            </para>
+            </remarks>
+            <overloads>This method has two overloads.</overloads>
+            <param name="FileOrDirectoryName">the name of the file or directory to add.</param>
+            
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.AddItem(System.String,System.String)">
+            <summary>
+            Adds an item, either a file or a directory, to a zip file archive.  
+            </summary>
+            
+            <remarks>
+            <para>
+            If adding a directory, the add is recursive on all files and subdirectories 
+            contained within it. 
+            </para>
+            <para>
+            The name of the item may be a relative path or a fully-qualified path.
+            The item added by this call to the ZipFile is not written to the zip file
+            archive until the application calls Save() on the ZipFile. 
+            </para>
+            
+            <para>
+            This version of the method allows the caller to explicitly specify the 
+            directory path to be used in the archive. 
+            </para>
+            
+            </remarks>
+            
+            <param name="FileOrDirectoryName">the name of the file or directory to add.</param>
+            <param name="DirectoryPathInArchive">
+            The name of the directory path to use within the zip archive. 
+            This path may, or may not, correspond to a real directory in the current filesystem.
+            If the files within the zip are later extracted, this is the path used for the extracted file. 
+            Passing null will use the path on the FileOrDirectoryName.  Passing the empty string ("")
+            will insert the item at the root path within the archive.
+            </param>
+            
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.AddFile(System.String)">
+            <summary>
+            Adds a File to a Zip file archive. The name of the file may be a relative path or 
+            a fully-qualified path. 
+            </summary>
+            <remarks>
+            The file added by this call to the ZipFile is not written to the zip file
+            archive until the application calls Save() on the ZipFile. 
+            </remarks>
+            <overloads>This method has two overloads.</overloads>
+            <param name="FileName">the name of the file to add.</param>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.AddFile(System.String,System.String)">
+             <summary>
+             Adds a File to a Zip file archive. The name of the file may be a relative path or 
+             a fully-qualified path. 
+             </summary>
+             
+             <remarks>
+             <para>
+             The file added by this call to the ZipFile is not written to the zip file
+             archive until the application calls Save() on the ZipFile. 
+             </para>
+             
+             <para>
+             This version of the method allows the caller to explicitly specify the 
+             directory path to be used in the archive. 
+             </para>
+             
+             </remarks>
+             
+             <example>
+             <code>
+                try
+                {
+                  using (ZipFile zip = new ZipFile("test2.zip",System.Console.Out))
+                  {
+                    zip.AddFile("c:\\photos\\personal\\7440-N49th.png", "images");
+                    zip.AddFile("c:\\Desktop\\2005_Annual_Report.pdf", "files\\documents");
+                    zip.AddFile("test2.cs", "files\\text");
+            
+                    zip.Save();
+                  }
+                }
+                catch (System.Exception ex1)
+                {
+                  System.Console.Error.WriteLine("exception: " + ex1);
+                }
+             </code>
+             </example>
+             
+             <param name="FileName">the name of the file to add.</param>
+             <param name="DirectoryPathInArchive">
+             Specifies a directory path to use to override any path in the FileName.
+             This path may, or may not, correspond to a real directory in the current filesystem.
+             If the files within the zip are later extracted, this is the path used for the extracted file. 
+             Passing null will use the path on the FileName.  Passing the empty string ("")
+             will insert the item at the root path within the archive.
+             </param>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.AddDirectory(System.String)">
+            <summary>
+            Adds a Directory to a Zip file archive. 
+            </summary>
+            
+            <remarks>
+            The name of the directory may be 
+            a relative path or a fully-qualified path. The add operation is recursive,
+            so that any files or subdirectories within the name directory are also
+            added to the archive.
+            </remarks>
+            
+            <param name="DirectoryName">the name of the directory to add.</param>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.AddDirectory(System.String,System.String)">
+            <summary>
+            Adds a Directory to a Zip file archive. 
+            </summary>
+            
+            <remarks>
+            The name of the directory may be 
+            a relative path or a fully-qualified path. The add operation is recursive,
+            so that any files or subdirectories within the name directory are also
+            added to the archive.
+            </remarks>
+            
+            <param name="DirectoryName">the name of the directory to add.</param>
+            
+            <param name="DirectoryPathInArchive">
+            Specifies a directory path to use to override any path in the DirectoryName.
+            This path may, or may not, correspond to a real directory in the current filesystem.
+            If the zip is later extracted, this is the path used for the extracted file or directory. 
+            Passing null will use the path on the DirectoryName.  Passing the empty string ("")
+            will insert the item at the root path within the archive.
+            </param>
+            
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.Save">
+            <summary>
+            Saves the Zip archive, using the name given when the ZipFile was instantiated. 
+            </summary>
+            <remarks>
+            The zip file is written to storage only when the caller calls <c>Save()</c>.  
+            The Save operation writes the zip content to a temporary file. 
+            Then, if the zip file already exists (for example when adding an item to a zip archive)
+            this method will replace the existing zip file with this temporary file.
+            If the zip file does not already exist, the temporary file is renamed 
+            to the desired name.  
+            </remarks>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.Read(System.String)">
+            <summary>
+            Reads a zip file archive and returns the instance.  
+            </summary>
+            
+            <exception cref="T:System.Exception">
+            Thrown if the zipfile cannot be read. The implementation of this 
+            method relies on <c>System.IO.File.OpenRead()</c>, which can throw
+            a variety of exceptions, including specific exceptions if a file
+            is not found, an unauthorized access exception, exceptions for
+            poorly formatted filenames, and so on. 
+            </exception>
+            
+            <param name="ZipFileName">
+            The name of the zip archive to open.  
+            This can be a fully-qualified or relative pathname.
+            </param>
+            
+            <overloads>This method has 2 overloads.</overloads>
+            
+            <returns>The instance read from the zip archive.</returns>
+            
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.Read(System.String,System.IO.TextWriter)">
+            <summary>
+            Reads a zip file archive and returns the instance.  
+            </summary>
+            
+            <remarks>
+            <para>
+            This version of the method allows the caller to pass in a TextWriter, to which verbose 
+            messages will be written during extraction or creation of the zip archive.  A console application
+            may wish to pass System.Console.Out to get messages on the Console. A graphical or headless application
+            may wish to capture the messages in a different TextWriter. 
+            </para>
+            </remarks>
+            
+            <exception cref="T:System.Exception">
+            Thrown if the zipfile cannot be read. The implementation of this 
+            method relies on <c>System.IO.File.OpenRead()</c>, which can throw
+            a variety of exceptions, including specific exceptions if a file
+            is not found, an unauthorized access exception, exceptions for
+            poorly formatted filenames, and so on. 
+            </exception>
+            
+            <param name="ZipFileName">
+            The name of the zip archive to open.  
+            This can be a fully-qualified or relative pathname.
+            </param>
+            
+            <param name="Output">The <c>System.IO.TextWriter</c> to be used for output messages.</param>
+            
+            <returns>The instance read from the zip archive.</returns>
+            
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.GetEnumerator">
+             <summary>
+             Generic IEnumerator support, for use of a ZipFile in a foreach construct.  
+             </summary>
+             <example>
+             This example reads a zipfile of a given name, then enumerates the 
+             entries in that zip file, and displays the information about each 
+             entry on the Console.
+             <code>
+             using (ZipFile zip = ZipFile.Read(zipfile))
+             {
+               bool header = true;
+               foreach (ZipEntry e in zip)
+               {
+                 if (header)
+                 {
+                    System.Console.WriteLine("Zipfile: {0}", zip.Name);
+                    System.Console.WriteLine("Version Needed: 0x{0:X2}", e.VersionNeeded);
+                    System.Console.WriteLine("BitField: 0x{0:X2}", e.BitField);
+                    System.Console.WriteLine("Compression Method: 0x{0:X2}", e.CompressionMethod);
+                    System.Console.WriteLine("\n{1,-22} {2,-6} {3,4}   {4,-8}  {0}",
+                                 "Filename", "Modified", "Size", "Ratio", "Packed");
+                    System.Console.WriteLine(new System.String('-', 72));
+                    header = false;
+                 }
+            
+                 System.Console.WriteLine("{1,-22} {2,-6} {3,4:F0}%   {4,-8}  {0}",
+                             e.FileName,
+                             e.LastModified.ToString("yyyy-MM-dd HH:mm:ss"),
+                             e.UncompressedSize,
+                             e.CompressionRatio,
+                             e.CompressedSize);
+            
+                 e.Extract(e.FileName);
+               }
+             }
+             </code>
+             </example>
+             
+             <returns>a generic enumerator suitable for use  within a foreach loop.</returns>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            IEnumerator support, for use of a ZipFile in a foreach construct.  
+            </summary>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.ExtractAll(System.String)">
+             <summary>
+             Extracts all of the items in the zip archive, to the specified path in the filesystem.  
+             The path can be relative or fully-qualified. 
+             </summary>
+             <remarks>
+             This method will send output messages to the output stream
+             if WantVerbose is set on the ZipFile instance. 
+             </remarks>
+             <example>
+             This example extracts all the entries in a zip archive file, 
+             to the specified target directory.  It handles exceptions that
+             may be thrown, such as unauthorized access exceptions or 
+             file not found exceptions. 
+             <code>
+                 try 
+                 {
+                   using(ZipFile zip= ZipFile.Read(ZipFile))
+                   {
+                     zip.ExtractAll(TargetDirectory, true);
+                   }
+                 }
+                 catch (System.Exception ex1)
+                 {
+                  System.Console.Error.WriteLine("exception: " + ex1);
+                 }
+            
+             </code>
+             </example>
+             
+             <param name="path">the path to which the contents of the zipfile are extracted.</param>
+             
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.Extract(System.String)">
+            <summary>
+            Extract a single item from the archive.  The file, including any qualifying path, 
+            is created at the current working directory.  
+            </summary>
+            <param name="filename">the file to extract. It must be the exact filename, including the path contained in the archive, if any. </param>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.Extract(System.String,System.IO.Stream)">
+            <summary>
+            Extract a single specified file from the archive, to the given stream.  This is 
+            useful when extracting to Console.Out for example. 
+            </summary>
+            <param name="filename">the file to extract.</param>
+            <param name="s">the stream to extact to.</param>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.Finalize">
+            <summary>
+            This is the class Destructor, which gets called implicitly when the instance is destroyed.  
+            Because the ZipFile type implements IDisposable, this method calls Dispose(false).  
+            </summary>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.Dispose">
+            <summary>
+            Handles closing of the read and write streams associated
+            to the ZipFile, if necessary.  The Dispose() method is generally 
+            employed implicitly, via a using() {} statement. 
+            </summary>
+            <example>
+            <code>
+            using (ZipFile zip = ZipFile.Read(zipfile))
+            {
+              foreach (ZipEntry e in zip)
+              {
+                if (WantThisEntry(e.FileName)) 
+                  zip.Extract(e.FileName, Console.OpenStandardOutput());
+              }
+            } // Dispose() is called implicitly here.
+            </code>
+            </example>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipFile.Dispose(System.Boolean)">
+            <summary>
+            The Dispose() method.  It disposes any managed resources, 
+            if the flag is set, then marks the instance disposed.
+            This method is typically not called from application code.
+            </summary>
+            <param name="disposeManagedResources">indicates whether the method should dispose streams or not.</param>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipFile.Name">
+            <summary>
+            This read-only property specifies the name of the zipfile to read or write. It is 
+            set when the instance of the ZipFile type is created.
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipFile.TrimVolumeFromFullyQualifiedPaths">
+             <summary>
+             When this is set, any volume name (eg C:) is trimmed 
+             from fully-qualified pathnames on any ZipEntry, before writing the 
+             ZipEntry into the ZipFile. 
+             </summary>
+             <remarks>
+             The default value is true. This setting must be true to allow 
+             Windows Explorer to read the zip archives properly. 
+             The property is included for backwards compatibility only.  You'll 
+             almost never need to set this to false.
+             </remarks>
+            
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipFile.Verbose">
+            <summary>
+            Determines whether verbose output is sent to Output 
+            during <c>AddXxx()</c> and <c>ReadXxx()</c> operations. 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipFile.Output">
+            <summary>
+            Gets or sets the TextWriter for the instance. If the TextWriter
+            is set to a non-null value, then verbose output is sent to the 
+            TextWriter during Add and Read operations.  
+            </summary>
+            <example>
+            <code>
+            ZipFile zf= new ZipFile(FilePath);
+            zf.Output= System.Console.Out;
+            zf.ExtractAll();
+            </code>
+            </example>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipFile.Item(System.String)">
+            <summary>
+            This is a name-based indexer into the Zip archive.  
+            </summary>
+            <param name="filename">the name of the file in the zip to retrieve.</param>
+            <returns>The ZipEntry within the Zip archive, given by the specified filename.</returns>
+        </member>
+        <member name="T:Ionic.Utils.Zip.CRC32">
+            <summary>
+            Calculates a 32bit Cyclic Redundancy Checksum (CRC) using the
+            same polynomial used by Zip. This type ie generally not used directly
+            by applications wishing to create, read, or manipulate zip archive files.
+            </summary>
+        </member>
+        <member name="M:Ionic.Utils.Zip.CRC32.GetCrc32(System.IO.Stream)">
+            <summary>
+            Returns the CRC32 for the specified stream.
+            </summary>
+            <param name="input">The stream over which to calculate the CRC32</param>
+            <returns>the CRC32 calculation</returns>
+        </member>
+        <member name="M:Ionic.Utils.Zip.CRC32.GetCrc32AndCopy(System.IO.Stream,System.IO.Stream)">
+            <summary>
+            Returns the CRC32 for the specified stream, and writes the input into the output stream.
+            </summary>
+            <param name="input">The stream over which to calculate the CRC32</param>
+            <param name="output">The stream into which to deflate the input</param>
+            <returns>the CRC32 calculation</returns>
+        </member>
+        <member name="M:Ionic.Utils.Zip.CRC32.#ctor">
+            <summary>
+            Construct an instance of the CRC32 class, pre-initialising the table
+            for speed of lookup.
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.CRC32.TotalBytesRead">
+            <summary>
+            indicates the total number of bytes read on the CRC stream.
+            This is used when writing the ZipDirEntry when compressing files.
+            </summary>
+        </member>
+        <member name="T:Ionic.Utils.Zip.ZipEntry">
+            <summary>
+            Represents a single entry in a ZipFile. Typically, applications
+            get a ZipEntry by enumerating the entries within a ZipFile. 
+            </summary>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipEntry.Read(System.IO.Stream)">
+            <summary>
+            Reads one ZipEntry from the given stream.  
+            </summary>
+            <param name="s">the stream to read from.</param>
+            <returns>the ZipEntry read from the stream.</returns>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipEntry.Extract">
+             <summary>
+             Extract the entry to the filesystem, starting at the current working directory. 
+             </summary>
+             <remarks>
+             <para>
+             The last modified time of the created file may be adjusted 
+             during extraction to compensate
+             for differences in how the .NET Base Class Library deals
+             with daylight saving time (DST) versus how the Windows
+             filesystem deals with daylight saving time. 
+             See http://blogs.msdn.com/oldnewthing/archive/2003/10/24/55413.aspx for more context.
+            </para>
+             <para>
+             In a nutshell: Daylight savings time rules change regularly.  In
+             2007, for example, the inception week of DST changed.  In 1977,
+             DST was in place all year round. in 1945, likewise.  And so on.
+             Win32 does not attempt to guess which time zone rules were in
+             effect at the time in question.  It will render a time as
+             "standard time" and allow the app to change to DST as necessary.
+              .NET makes a different choice.
+            </para>
+             <para>
+             Compare the output of FileInfo.LastWriteTime.ToString("f") with
+             what you see in the property sheet for a file that was last
+             written to on the other side of the DST transition. For example,
+             suppose the file was last modified on October 17, during DST but
+             DST is not currently in effect. Explorer's file properties
+             reports Thursday, October 17, 2003, 8:45:38 AM, but .NETs
+             FileInfo reports Thursday, October 17, 2003, 9:45 AM.
+            </para>
+             <para>
+             Win32 says, "Thursday, October 17, 2002 8:45:38 AM PST". Note:
+             Pacific STANDARD Time. Even though October 17 of that year
+             occurred during Pacific Daylight Time, Win32 displays the time as
+             standard time because that's what time it is NOW.
+            </para>
+             <para>
+             .NET BCL assumes that the current DST rules were in place at the
+             time in question.  So, .NET says, "Well, if the rules in effect
+             now were also in effect on October 17, 2003, then that would be
+             daylight time" so it displays "Thursday, October 17, 2003, 9:45
+             AM PDT" - daylight time.
+            </para>
+             <para>
+             So .NET gives a value which is more intuitively correct, but is
+             also potentially incorrect, and which is not invertible. Win32
+             gives a value which is intuitively incorrect, but is strictly
+             correct.
+            </para>
+             <para>
+             With this adjustment, I add one hour to the tweaked .NET time, if
+             necessary.  That is to say, if the time in question had occurred
+             in what the .NET BCL assumed to be DST (an assumption that may be
+             wrong given the constantly changing DST rules).
+             </para>
+             <overloads>This method has three overloads.</overloads>
+             </remarks>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipEntry.Extract(System.IO.Stream)">
+            <summary>
+            Extracts the entry to the specified stream. For example, the caller could specify Console.Out.
+            </summary>
+            <param name="s">the stream to which the entry should be extracted.  </param>
+        </member>
+        <member name="M:Ionic.Utils.Zip.ZipEntry.Extract(System.String)">
+            <summary>
+            Extract the entry to the filesystem, starting at the specified base directory. 
+            </summary>
+            <param name="BaseDirectory">the pathname of the base directory</param>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipEntry.LastModified">
+            <summary>
+            The time and date at which the file indicated by the ZipEntry was last modified. 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipEntry.TrimVolumeFromFullyQualifiedPaths">
+            <summary>
+            When this is set, this class trims the volume (eg C:\) from any 
+            fully-qualified pathname on the ZipEntry, 
+            before writing the ZipEntry into the ZipFile. 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipEntry.LocalFileName">
+            <summary>
+            The name of the file contained in the ZipEntry. 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipEntry.FileName">
+            <summary>
+            The name of the file contained in the ZipEntry. 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipEntry.VersionNeeded">
+            <summary>
+            The version of the zip engine needed to read the ZipEntry.  This is usually 0x14. 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipEntry.BitField">
+            <summary>
+            a bitfield as defined in the zip spec. 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipEntry.CompressionMethod">
+            <summary>
+            The compression method employed for this ZipEntry. 0x08 = Deflate.  0x00 = Store (no compression). 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipEntry.CompressedSize">
+            <summary>
+            The compressed size of the file, in bytes, within the zip archive. 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipEntry.UncompressedSize">
+            <summary>
+            The size of the file, in bytes, before compression, or after extraction. 
+            </summary>
+        </member>
+        <member name="P:Ionic.Utils.Zip.ZipEntry.CompressionRatio">
+            <summary>
+            The ratio of compressed size to uncompressed size. 
+            </summary>
+        </member>
+    </members>
+</doc>

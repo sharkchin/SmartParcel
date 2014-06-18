@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{35211B19-9B23-4523-81F8-6CD7E497D55B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MasterProgram</RootNamespace>
+    <AssemblyName>MasterProgram</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dmp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\CSharpLib\DMPLib\DMPLib\bin\Release\Dmp.dll</HintPath>
+    </Reference>
+    <Reference Include="GeoAPI">
+      <HintPath>DLL\NetTopologySuite\GeoAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>DLL\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Types, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\CSharpLib_testing\DMP.Websites.Neptune\Bin\Microsoft.SqlServer.Types.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="monoGIS">
+      <HintPath>DLL\monoGIS.dll</HintPath>
+    </Reference>
+    <Reference Include="NetTopologySuite">
+      <HintPath>DLL\NetTopologySuite\NetTopologySuite.dll</HintPath>
+    </Reference>
+    <Reference Include="Noesis.Javascript, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\Noesis.Javascript v0.7 - Binaries\Noesis.Javascript v0.7 - Binaries\.Net3.5\x86\Noesis.Javascript.dll</HintPath>
+    </Reference>
+    <Reference Include="PowerCollections">
+      <HintPath>DLL\NetTopologySuite\PowerCollections.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\..\SmartParcelStatistics\SmartParcelStatistics\bin\Debug\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MasterProgram\ProcessorMetadata\AnalysisEngineMetadata.cs" />
+    <Compile Include="MasterProgram\ProcessorMetadata\JavascriptProcessorMetadata.cs" />
+    <Compile Include="MasterProgram\ProcessorMetadata\MasterProgramMetadata.cs" />
+    <Compile Include="MasterProgram\MasterProcessor.cs" />
+    <Compile Include="MasterProgram\ProcessorMetadata\OutputProcessorMetadata.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\CalculateUsableAcreage.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\DistanceToAirport.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryArea.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryDifference.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryDistance.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryIntersectionAndArea.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryIntersectUsingMS.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetElevationIntersection.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetIntersectedList.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\IGeometryAlgorithm.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\AnalysisEngine.cs" />
+    <Compile Include="MasterProgram\Processors\OutputProcessor\OutputWriter.cs" />
+    <Compile Include="MasterProgram\Processors\IRecordProcessor.cs" />
+    <Compile Include="MasterProgram\Processors\JavaScript\JavascriptProcessor.cs" />
+    <Compile Include="MasterProgram\RecordProcessorThread.cs" />
+    <Compile Include="MasterProgram\Utils\AnalysisEngineUtil\AlgorithmUtil.cs" />
+    <Compile Include="MasterProgram\Utils\Caching\LRUCache.cs" />
+    <Compile Include="MasterProgram\Utils\Caching\RecordCache.cs" />
+    <Compile Include="MasterProgram\Utils\Caching\RWLock.cs" />
+    <Compile Include="MasterProgram\Utils\Chunking\CFTIdGenerator.cs" />
+    <Compile Include="MasterProgram\Utils\Chunking\TileSystem.cs" />
+    <Compile Include="MasterProgram\Utils\DatabaseManager\MasterProgDBManager.cs" />
+    <Compile Include="MasterProgram\Utils\DatabaseManager\SQLiteManager.cs" />
+    <Compile Include="MasterProgram\Utils\DatabaseManager\SQLManager.cs" />
+    <Compile Include="MasterProgram\Utils\DataSet.cs" />
+    <Compile Include="MasterProgram\Utils\Elevation\ElevationProcessor.cs" />
+    <Compile Include="MasterProgram\Utils\Elevation\ShapeFileQueryEngine.cs" />
+    <Compile Include="MasterProgram\Utils\Elevation\SlopeCalculator.cs" />
+    <Compile Include="MasterProgram\Utils\MasterProgramConstants.cs" />
+    <Compile Include="MasterProgram\Utils\Parsers\AnalysisEngineParser.cs" />
+    <Compile Include="MasterProgram\Utils\Parsers\JavascriptParser.cs" />
+    <Compile Include="MasterProgram\Utils\Parsers\MasterProgramParser.cs" />
+    <Compile Include="MasterProgram\Utils\Parsers\OutputProcessorParser.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="MasterProgram\Utils\AnalysisEngineUtil\CVS\Entries" />
+    <None Include="MasterProgram\Utils\AnalysisEngineUtil\CVS\Repository" />
+    <None Include="MasterProgram\Utils\AnalysisEngineUtil\CVS\Root" />
+    <None Include="MasterProgram\Utils\Elevation\CVS\Entries" />
+    <None Include="MasterProgram\Utils\Elevation\CVS\Repository" />
+    <None Include="MasterProgram\Utils\Elevation\CVS\Root" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MasterProgram\Processors\AnalysisEngine\Geometries\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

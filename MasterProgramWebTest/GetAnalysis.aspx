@@ -1,0 +1,1 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="GetAnalysis.aspx.cs" Inherits="GetAnalysis" %>

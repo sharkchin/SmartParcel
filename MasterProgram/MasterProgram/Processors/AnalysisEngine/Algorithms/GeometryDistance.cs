@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using DMP.MasterProgram.Processors.AnalysisEngine.Algorithms;
+using DMP.MasterProgram.Processors.AnalysisEngine.Geometries;
 using Dmp.Neptune.Collections;
 using Dmp.Neptune.Data;
 using Dmp.Neptune.Utils.ShapeFile;
@@ -13,115 +14,123 @@ using log4net;
 using log4net.Config;
 using Microsoft.SqlServer.Types;
 using System.Windows;
-using DMP.MasterProgram.Utils.AnalysisEngineUtil;
-
 
 
 namespace DMP.MasterProgram.Processors.AnalysisEngine.Algorithms
 {
-    public class GeometryDistance : IGeometryAlgorithm
+    class GeometryDistance : IGeometryAlgorithm
     {
         public const int SRID = 4269;
         private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private List<AbstractRecord> impactors;
+        private Dictionary<String, String> parameters;
 
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="record">Subject Record</param>
         /// <returns>List of Impactors intersect with Subject Record</returns>
-        public object ProcessRecord1(AbstractRecord record, bool isSubByTask)
-        {
-            double dist = double.MaxValue;
-              
-            SqlGeometry parcel = (SqlGeometry)record[MasterProgramConstants.GEOMETRY_BIN];
-            SqlGeography p1 = SqlGeography.STGeomFromWKB(parcel.STStartPoint().STAsBinary(), SRID);
-
-            if (parcel == null)
-            {
-                logger.Error("Error while processing record in IntersectAlgorithm :AE Geometry for subject record is not defined");
-            }
-            SqlGeometry imp = new SqlGeometry();
-            if (impactors.Count > 0)
-            {
-                for (int i = 0; i < impactors.Count; i++)
-                {
-                    AbstractRecord impactor = impactors.ElementAt(i);
-                    imp = (SqlGeometry)impactor[MasterProgramConstants.GEOMETRY_BIN];
-                    if (!parcel.IsNull && !imp.IsNull)
-                        dist = Math.Min(dist, parcel.STStartPoint().STDistance(imp).Value);
-                }
-
-                SqlGeography p2 = SqlGeography.STGeomFromWKB(imp.STStartPoint().STAsBinary(), SRID);
-                double ratio = p1.STDistance(p2).Value / parcel.STStartPoint().STDistance(imp.STStartPoint()).Value;
-                dist = dist * ratio;
-            }
-            return dist;
-        }
-
         public object ProcessRecord(AbstractRecord record, bool isSubByTask)
-        {
+        {           
             double dist = double.MaxValue;
-            object o = record[MasterProgramConstants.GEOMETRY_BIN];
+            object o=record[MasterProgramConstants.GEOMETRY_BIN];
             if (o is DBNull)
                 return null;
             SqlGeometry parcel = (SqlGeometry)o, cent = new SqlGeometry();
-            Vector pcvec;
+            double lat = double.NaN, lon = double.NaN;
+            Vector pcvec = new Vector();
+            if (record.Fields.Contains("lat") && record.Fields.Contains("lon"))
+            {
+                o = record["lat"];
+                lat = o is DBNull ? double.NaN : (double)o;
+                o = record["lon"];
+                lon = o is DBNull ? double.NaN : (double)o;
+                pcvec = new Vector(lon, lat);
+                cent = GeoUtils.Point2SqlGeometry(pcvec, SRID);
+            }
+            if (double.IsNaN(lat) || double.IsNaN(lon))
+            {
+                if (!parcel.STIsValid())
+                    parcel = parcel.MakeValid();
+                if (parcel.STGeometryType() != "Polygon" && parcel.STGeometryType() != "MultiPolygon")
+                    cent = GetCenterOfPoints(parcel);
+                else
+                    cent = parcel.STCentroid();
+                lat = cent.STY.Value; lon = cent.STX.Value;
+                pcvec = new Vector(lon, lat);
+            }
+            
+            int s = 0;
             try
             {
-                object p = record[MasterProgramConstants._X_COORD], q = record[MasterProgramConstants._Y_COORD];
-                if (p is DBNull || q is DBNull)
-                {
-                    cent = parcel.STEnvelope().STBuffer(0.00002).STCentroid();
-                    pcvec = new Vector(cent.STX.Value, cent.STY.Value);
-                }
-                else
-                {
-                    pcvec = new Vector((double)p, (double)q);
-                    cent = AlgorithmUtil.Point2SqlGeometry(pcvec, SRID);
-                }
-
-                int s = 0;
                 if (impactors.Count > 0)
-                {
+                {                    
                     for (int i = 0; i < impactors.Count; i++)
                     {
                         AbstractRecord impactor = impactors.ElementAt(i);
-                        Vector impvec = new Vector((double)impactor[MasterProgramConstants._X_COORD], (double)impactor[MasterProgramConstants._Y_COORD]);
-                        double disti = (impvec - pcvec).Length;
+                        SqlGeometry imp = (SqlGeometry)impactor[MasterProgramConstants.GEOMETRY_BIN];                        
+                        double disti = parcel.STDistance(imp).Value;
                         if (dist > disti)
                         {
                             dist = disti;
                             s = i;
                         }
-                    }
-
-                }
-                if (dist == double.MaxValue)
-                    return -9999;
-                else
-                {
-                    AbstractRecord closeimp = impactors.ElementAt(s);
-                    SqlGeometry closeImpGeom = (SqlGeometry)closeimp[MasterProgramConstants.GEOMETRY_BIN];
-                    dist = cent.STDistance(closeImpGeom).Value;
-                    return dist * AlgorithmUtil.MetersPerDegree(((double)closeimp[MasterProgramConstants._X_COORD] + pcvec.X) / 2, ((double)closeimp[MasterProgramConstants._Y_COORD] + pcvec.Y) / 2, SRID);
-                }
-           
-            
+                    }                    
+                }           
             }
-            catch (Exception ex)
+            catch (Exception e)
+            { 
+                Console.WriteLine(e.Message); 
+            }
+            if (dist == double.MaxValue)
             {
-                throw new ApplicationException("Error while calculating shortest distance between subject and impactor : " + ex.Message);
+                impactors = null;
+                return -9999;
             }
-           
+            else
+            {
+                AbstractRecord closeimp = impactors.ElementAt(s);
+                impactors = null;
+                return dist * GeoUtils.MetersPerDegree(((double)closeimp["_X_COORD"] + pcvec.X) / 2, ((double)closeimp["_Y_COORD"] + pcvec.Y) / 2, SRID);
+            }
         }
+        private SqlGeometry GetCenterOfPoints(SqlGeometry geo)
+        {
+            int n = geo.STNumPoints().Value;
+            Vector accum = new Vector(0, 0);
 
+            for (int i = 0; i < n; i++)
+            {
+                accum += Point2Vector(geo.STPointN(i + 1));
+            }
+
+            return GeoUtils.Point2SqlGeometry(accum / n, geo.STSrid.Value);
+        }
+        private SqlGeography GetGeographyFromGeometry(SqlGeometry geom)
+        {
+            if (geom == null) return null;
+            
+            try
+            {
+                return SqlGeography.STGeomFromWKB(geom.STAsBinary(), SRID);
+            }
+            catch (Exception)
+            {
+                // A common reason for an exception being thrown is invalid ring orientation, 
+                // so attempt to fix it. The technique used is described at
+                // http://blogs.msdn.com/edkatibah/archive/2008/08/19/working-with-invalid-data-and-the-sql-server-2008-geography-data-type-part-1b.aspx
+                
+                return SqlGeography.STGeomFromWKB(
+                    geom.MakeValid().Reduce(.000001).STUnion(geom.STStartPoint()).STAsBinary(), SRID);
+            }
+        }
 
         /// <summary>
         /// set the Impactor List
         /// </summary>
         /// <param name="impactors">impactor List</param>
-        public void InitializeImpactors( List<AbstractRecord> impactors)
+        public void InitializeImpactors(List<AbstractRecord> impactors)
         {
             this.impactors = impactors;
 
@@ -133,11 +142,11 @@ namespace DMP.MasterProgram.Processors.AnalysisEngine.Algorithms
         /// <param name="parameters"></param>
         public void InitializeParameters(Dictionary<String, String> parameters)
         {
-            //this.parameters = parameters;
+            this.parameters = parameters;
         }
-
-       
-
+        private static Vector Point2Vector(SqlGeometry point)
+        {
+            return new Vector(point.STX.Value, point.STY.Value);
+        }
     }
 }
-

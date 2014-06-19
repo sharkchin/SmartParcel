@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using Dmp.Neptune.Webservices;
 using MonoGIS.NetTopologySuite.Geometries;
 using System.Xml;
+using Dmp.Auth;
 
 namespace MasterProgram
 {

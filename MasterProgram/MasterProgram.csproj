@@ -44,6 +44,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\CSharpLib\DMPLib\DMPLib\bin\Release\Dmp.dll</HintPath>
     </Reference>
+    <Reference Include="Dmp.Auth, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\CSharpLib\DMPLib\Dmp.Auth\bin\Release\Dmp.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Dmp.Auth.Encryption, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\CSharpLib\DMPLib\Dmp.Auth.Encryption\bin\Release\Dmp.Auth.Encryption.dll</HintPath>
+    </Reference>
+    <Reference Include="DMPGeometryLibrary">
+      <HintPath>..\..\DMPGeometryLibrary\DMPGeometryLibrary\bin\Debug\DMPGeometryLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="GeoAPI">
       <HintPath>DLL\NetTopologySuite\GeoAPI.dll</HintPath>
     </Reference>
@@ -69,9 +80,11 @@
       <HintPath>DLL\NetTopologySuite\PowerCollections.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite">
-      <HintPath>..\..\SmartParcelStatistics\SmartParcelStatistics\bin\Debug\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.84.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\UnionNetwork\UnionNetwork\bin\Debug\System.Data.SQLite.DLL</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
@@ -87,17 +100,67 @@
     <Compile Include="MasterProgram\ProcessorMetadata\MasterProgramMetadata.cs" />
     <Compile Include="MasterProgram\MasterProcessor.cs" />
     <Compile Include="MasterProgram\ProcessorMetadata\OutputProcessorMetadata.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\Back2ocean.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\Back2polygon.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\Back2Road.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\BufferCutByRoad.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\CalcAcreage.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\CalculateUsableAcreage.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\CornerLot.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\CornerLot2.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\Dist2Airport.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\Dist2Airport2.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\Dist2Freeway.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\Dist2majorRoad.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\Dist2park.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\Dist2PubSchool.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\Dist2rail.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\DistanceToAirport.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\FastGeometryDistance.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryArea.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryDifference.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryDistance.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryIntersect.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryIntersectionAndArea.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GeometryIntersectUsingMS.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetAttendanceZone.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetB2MR.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetBlockId.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetCDS.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetCDSBuffer.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetCDSRd.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetCLBuffer.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetCornerLotLines.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetElevation.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetElevationFacts.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetElevationIntersection.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetGolfParcels.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetIntersectedList.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetMRBuffer.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetNeighborCnt.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetNeighborhoodId.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetRdGeometry.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetRoadBuffer.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetSchoolDistrict.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetSqliteB2MR.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetSqliteCDS.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetSqliteCDSCL.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\GetSqliteCL.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\IGeometryAlgorithm.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\JnctCnt.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\ParcelDir.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\ParcelDirFacts.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\PolyCentroid.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\PolygonCutByRd.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\PreGetCLBuffer.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\SizePercentile.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\StreetBuffer.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Algorithms\TouchPolygon.cs" />
     <Compile Include="MasterProgram\Processors\AnalysisEngine\AnalysisEngine.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Geometries\AEEnvelope.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Geometries\AEGeometry.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Geometries\AEPoint.cs" />
+    <Compile Include="MasterProgram\Processors\AnalysisEngine\Geometries\AEPolygon.cs" />
     <Compile Include="MasterProgram\Processors\OutputProcessor\OutputWriter.cs" />
     <Compile Include="MasterProgram\Processors\IRecordProcessor.cs" />
     <Compile Include="MasterProgram\Processors\JavaScript\JavascriptProcessor.cs" />
@@ -132,9 +195,7 @@
     <None Include="MasterProgram\Utils\Elevation\CVS\Repository" />
     <None Include="MasterProgram\Utils\Elevation\CVS\Root" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MasterProgram\Processors\AnalysisEngine\Geometries\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

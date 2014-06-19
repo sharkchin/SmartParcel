@@ -360,7 +360,7 @@ namespace DMP.MasterProgram
             }
             catch (ThreadAbortException ex)
             {
-                
+                Console.WriteLine("exception happened in MasterProcessor:" + ex.StackTrace);
 
             }
             catch (Exception e)

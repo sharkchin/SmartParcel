@@ -376,7 +376,7 @@ namespace DMP.MasterProgram.Utils.DatabaseManager
                 }
                 catch (Exception e)
                 {
-                    logger.Error("Database Coonection not closed correctly");
+                    logger.Error("Database Coonection not closed correctly:"+e.StackTrace);
 
                 }
 
